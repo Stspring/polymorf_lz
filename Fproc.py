@@ -6,30 +6,34 @@
 
 import pandas as pd
 
+# Создаем класс для работы с датафреймом
 class Divide:
     def __init__(self,file_path):
         self.file_path = file_path
         self.df = pd.read_csv(file_path)
     
 
-    # Метод для разделения на 2 датасета
+    # Метод для разделения на 2 части
     def split_dataset(self):
 
-        self.partic = self.df[self.df['Участники гражданского оборота'] == 'физ. лицо']
-        self.n_partic = self.df[self.df['Участники гражданского оборота'] == 'юр. лицо']
+        self.individ_p = self.df[self.df['Участники гражданского оборота'] == 'физ. лицо']     #Создаем новый датафрейм который содержит только физ. лиц
+        self.legal_p = self.df[self.df['Участники гражданского оборота'] == 'юр. лицо']    #Создаем новый датафрейм который содержит только юр. лиц
 
-        self.partic.to_csv('partic.csv', index=False)
-        self.n_partic.to_csv('n_partic.csv', index=False)
-    # ______________________________________________________________________________________
-    # Переопределяем унарный оператор '-' для удаления дубликатов
-    def __neg__(self):
+        self.individ_p.to_csv('individ_p.csv', index=False)
+        self.legal_p.to_csv('legal_p.csv', index=False)
+   
+    # Определяем унарный оператор
+    def __invert__(self):
+        line_before = len(self.df)              # Кол-во строк до удаления
+        self.df.drop_duplicates(inplace=True)   # Удаляем дубликаты из таблицы
+        line_after = len(self.df)               # Кол-во строк после удаления
+        self.duplicates_removed = line_before - line_after # Считаем, сколько строк было удалено
+        # _________________________________________________
+        self.df.to_csv("var1_modified.csv", index=False)
+        # _________________________________________________
+        return self
 
-        initial_count = len(self.df)
-        self.df.drop_duplicates(inplace=True)
-        final_count = len(self.df)
-        
-        removed_duplicates = initial_count - final_count
-        print(f"Количество повторяющихся строк в наборе данных: {removed_duplicates}")
-        
+    def print_result(self):
+        print(f" Количество удалённых дубликатов: {self.duplicates_removed}")
 
 
